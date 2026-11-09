@@ -11,9 +11,7 @@
 <meta name="description" content="Интерактивное арт-приключение: один мир, одна красная нить.">
 
 
-<link rel="manifest" href="./manifest.webmanifest">
-<link rel="apple-touch-icon" href="./icon-192.png">
-<title>ШОВ / SEAM — кинематографический пролог v0.9</title>
+<title>ШОВ / SEAM — кинематографический пролог v1.0</title>
 <style>
 :root{--ink:#0c0c0d;--bone:#e9dfca;--red:#d73525;--muted:#b3a58a;--safeT:env(safe-area-inset-top,0px);--safeB:env(safe-area-inset-bottom,0px)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -27,7 +25,7 @@ body{font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Helvetica Neue"
 #brand svg{width:16px;height:25px}
 #chapter{position:absolute;top:calc(var(--safeT) + 29px);right:24px;color:#d0c4ad;font-size:10px;letter-spacing:.17em}
 #sound{position:absolute;top:calc(var(--safeT) + 65px);right:22px;background:rgba(18,17,15,.53);backdrop-filter:blur(13px);-webkit-backdrop-filter:blur(13px);border:1px solid rgba(231,217,187,.35);border-radius:100px;color:#ece0c8;padding:10px 13px;font-size:11px;letter-spacing:.08em;pointer-events:auto;min-width:91px}
-#sound:focus-visible,#restart:focus-visible,#save:focus-visible{outline:2px solid var(--red);outline-offset:4px}
+#sound:focus-visible,#restart:focus-visible,#save:focus-visible,#updateReady:focus-visible{outline:2px solid var(--red);outline-offset:4px}
 body.phase-intro #heading{color:#29221b;text-shadow:0 1px 0 #fff6e3}
 body.phase-intro #eyebrow{color:#6a4e3b;text-shadow:none}
 body.phase-intro #description{color:#554535;text-shadow:none}
@@ -68,7 +66,7 @@ body.phase-intro #subgesture,body.phase-intro #counter,body.phase-intro #notice{
 @media (prefers-reduced-motion:reduce){#centerText,#endPanel,#bottom{animation:none;transition:none}}
 @media (orientation:landscape){#centerText{top:16%}#heading{font-size:29px}#bottom{bottom:calc(var(--safeB) + 12px)}#brand{top:calc(var(--safeT) + 12px)}}
 </style>
-</head>
+<link rel="manifest" href="./manifest.webmanifest"><link rel="apple-touch-icon" href="./icon-192.png"></head>
 <body>
 <canvas id="stage" aria-label="Игровое полотно. Потяни за красную нить и проведи её через кольца."></canvas>
 <div id="ui">
@@ -77,8 +75,8 @@ body.phase-intro #subgesture,body.phase-intro #counter,body.phase-intro #notice{
   <button id="sound" aria-label="Переключить звук">ЗВУК ВЫКЛ</button>
   <div id="centerText"><div id="eyebrow">НИ ОДИН МИР НЕ ВЕЧЕН</div><div id="heading">ВСЁ ДЕРЖИТСЯ<br>НА НИТИ</div><div id="description">Некоторые вещи лучше не трогать.</div></div>
   <div id="bottom"><div id="gesture">КОСНИСЬ КРАСНОГО УЗЛА</div><div id="subgesture">И ТЯНИ ВНИЗ, ЧТОБЫ РАСПОРОТЬ МИР</div><div id="progress"><i id="progressBar"></i></div><div id="counter">00 / 03</div></div>
-  <div id="endPanel"><div class="seal"><svg viewBox="0 0 52 52" fill="none"><path d="M26 0C15 9 37 14 24 26S35 40 26 52" stroke="#d73525" stroke-width="3"/><path d="M4 22h44M6 32h40" stroke="#e9dfca" stroke-width="1"/></svg></div><div class="small">ФРАГМЕНТ 01 · КОНЕЦ ПРОЛОГА</div><h2>МОРЕ<br>ПОМНИТ</h2><p>Ты изменил город. Но под водой нашлось кое-что, что умеет держать нить с другой стороны.</p><button id="save" class="action">СОХРАНИТЬ ОТПЕЧАТОК</button><button id="restart" class="action secondary">ПЕРЕПРОЙТИ ПРОЛОГ</button><div style="font-size:10px;color:#978a76;margin-top:15px">Продолжение полного приключения находится в разработке.</div></div>
-  <div id="notice">01 / ОДНА НИТЬ — ДВА МИРА · v0.9</div>
+  <div id="endPanel"><div class="seal"><svg viewBox="0 0 52 52" fill="none"><path d="M26 0C15 9 37 14 24 26S35 40 26 52" stroke="#d73525" stroke-width="3"/><path d="M4 22h44M6 32h40" stroke="#e9dfca" stroke-width="1"/></svg></div><div class="small">ФРАГМЕНТ 01–03 · ПРОТОТИП</div><h2>КОМНАТА<br>ПОМНИТ</h2><p>Ты перешил город, разбудил море и вернул луну на её место. Мир пока держится.</p><button id="save" class="action">СОХРАНИТЬ ОТПЕЧАТОК</button><button id="restart" class="action secondary">ПЕРЕПРОЙТИ ПРОЛОГ</button><div style="font-size:10px;color:#978a76;margin-top:15px">Главы IV–VI и настоящий финал ещё в разработке.</div></div>
+  <div id="notice">01 / ОДНА НИТЬ — ТРИ МИРА · v1.0</div>
 <div id="transitionLabel">И ГОРИЗОНТ<br>УШЁЛ ПОД ВОДУ<small>МИР МЕНЯЕТ ШОВ</small></div>
 </div>
 <button type="button" id="updateReady" aria-live="polite">ДОСТУПНА НОВАЯ ВЕРСИЯ · ОБНОВИТЬ</button>
@@ -91,20 +89,23 @@ const images={};let loaded=0;for(const [k,file] of Object.entries({city:'data:im
 let W=390,H=844,DPR=1,clock=0,last=0,hidden=false,anim=0,phase='intro',timeInPhase=0,drag=false,down={x:0,y:0,t:0},pointer={x:195,y:525},velocity={x:0,y:0},tear=0,reveal=0,fold=0,hold=0,seaDone=false,passed=0,rope=[],particles=[],ripples=[],pointerTrail=[],seaImpulses=[],seaHoldOrigin=null,transitionSoundPlayed=false,activePointerId=null,frames=0,frameSum=0,fps=60,
  soundOn=false,ac=null,master=null,drone=null,droneGain=null,windGain=null,seaGain=null,ambientNodes=[],audioPulse=0,
  quality='high',slowSeconds=0,fastSeconds=0,gesturePath=[],gestureTraceStarted=false,sceneChangeId=0,idleSeconds=0,
+ roomMoon={x:.32,y:.53},roomDragOrigin=null,roomSolved=false,roomOpen=0,roomTrail=[],
  stitchEchoes=[],feltPulse=0;
 const ringCoords=[{x:.74,y:.74},{x:.31,y:.52},{x:.62,y:.30}];const origin={x:.49,y:.89};
 const debug=new URLSearchParams(location.search).has('debug');if(debug)ui.debug.classList.add('show');
 const reduced=window.matchMedia('(prefers-reduced-motion:reduce)').matches;
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));const mix=(a,b,t)=>a+(b-a)*t;const smooth=t=>{t=clamp(t,0,1);return t*t*(3-2*t)};
 const rnd=(n)=>{let x=Math.sin(n*127.7+33.9)*43758.5453;return x-Math.floor(x)};
-function saveState(){try{localStorage.setItem('shov_v09_state',JSON.stringify({phase:phase==='intro'?'intro':phase==='city'?'city':phase==='sea'?'sea':phase==='end'?'end':'city',passed,gesturePath:gesturePath.slice(-400),ts:Date.now()}))}catch(e){}}
-function resume(){try{const d=JSON.parse(localStorage.getItem('shov_v09_state')||localStorage.getItem('shov_v08_state')||localStorage.getItem('shov_v07_state')||localStorage.getItem('shov_v06_state')||localStorage.getItem('shov_v05_state')||localStorage.getItem('shov_v04_state')||'null');if(!d)return; if(Array.isArray(d.gesturePath))gesturePath=d.gesturePath.filter(p=>Array.isArray(p)&&p.length===2&&p.every(Number.isFinite)).slice(-400); if(d.phase==='city' || d.phase==='sea' || d.phase==='end'){phase=d.phase;passed=d.phase==='city'?clamp(d.passed||0,0,2):3;if(phase==='sea')hold=0;if(phase==='end'){seaDone=true;hold=1}}}catch(e){}}
-function setPhase(next){phase=next;timeInPhase=0;idleSeconds=0;sceneChangeId++;drag=false;seaHoldOrigin=null;activePointerId=null;if(next==='fold')transitionSoundPlayed=false;if(next==='sea')seaImpulses=[];saveState();syncUI();scoreChange(next)}
+function saveState(){try{localStorage.setItem('shov_v10_state',JSON.stringify({phase:['intro','city','sea','room','end'].includes(phase)?phase:phase==='dive'?'room':'city',roomMoon,roomOpen,roomSolved,passed,gesturePath:gesturePath.slice(-400),ts:Date.now()}))}catch(e){}}
+function resume(){try{const d=JSON.parse(localStorage.getItem('shov_v10_state')||localStorage.getItem('shov_v09_state')||localStorage.getItem('shov_v08_state')||localStorage.getItem('shov_v07_state')||localStorage.getItem('shov_v06_state')||localStorage.getItem('shov_v05_state')||localStorage.getItem('shov_v04_state')||'null');if(!d)return; if(Array.isArray(d.gesturePath))gesturePath=d.gesturePath.filter(p=>Array.isArray(p)&&p.length===2&&p.every(Number.isFinite)).slice(-400); if(d.phase==='city' || d.phase==='sea' || d.phase==='room' || d.phase==='end'){phase=d.phase;passed=d.phase==='city'?clamp(d.passed||0,0,2):3;if(phase==='sea')hold=0;if(d.roomMoon&&Number.isFinite(d.roomMoon.x)&&Number.isFinite(d.roomMoon.y))roomMoon={x:clamp(d.roomMoon.x,.12,.86),y:clamp(d.roomMoon.y,.20,.76)};roomOpen=clamp(d.roomOpen||0,0,1);roomSolved=!!d.roomSolved;if(phase==='room'||phase==='end'){seaDone=true;hold=1}if(phase==='end'){roomSolved=true;roomOpen=1}}}catch(e){}}
+function setPhase(next){phase=next;timeInPhase=0;idleSeconds=0;sceneChangeId++;drag=false;seaHoldOrigin=null;activePointerId=null;if(next==='fold')transitionSoundPlayed=false;if(next==='sea')seaImpulses=[];if(next==='room')roomDragOrigin=null;saveState();syncUI();scoreChange(next)}
 function syncUI(){document.body.classList.toggle('phase-intro',phase==='intro');document.getElementById('transitionLabel').classList.toggle('show',phase==='fold');ui.center.classList.remove('hidden');ui.end.classList.remove('show');const bottom=document.getElementById('bottom');bottom.style.opacity='1';if(phase==='intro'){ui.chapter.textContent='ПРОЛОГ / 00';ui.eyebrow.textContent='НИ ОДИН МИР НЕ ВЕЧЕН';ui.heading.innerHTML='ВСЁ ДЕРЖИТСЯ<br>НА НИТИ';ui.description.textContent='Некоторые вещи лучше не трогать.';ui.gesture.textContent='КОСНИСЬ КРАСНОГО УЗЛА';ui.sub.textContent='И ТЯНИ ВНИЗ, ЧТОБЫ РАСПОРОТЬ МИР';ui.counter.textContent='00 / 03';ui.progress.style.width=(tear*100)+'%'}
 else if(phase==='reveal'){ui.center.classList.add('hidden');bottom.style.opacity='0';ui.chapter.textContent='ПРОЛОГ / РАЗРЫВ'}
 else if(phase==='city'){ui.chapter.textContent='ГЛАВА 01 / ГОРОД';ui.eyebrow.textContent='ПЕРЕВЁРНУТАЯ АРХИТЕКТУРА';ui.heading.innerHTML='ГОРОД<br>НАИЗНАНКУ';ui.description.textContent='Здесь у горизонта две стороны.';ui.gesture.textContent='ПРОВЕДИ НИТЬ ЧЕРЕЗ СВЕТЯЩИЕСЯ КОЛЬЦА';ui.sub.textContent='ЦЕПЛЯЙ ИХ ПО ПОРЯДКУ';ui.counter.textContent=`0${passed} / 03`;ui.progress.style.width=(passed/3*100)+'%'}
 else if(phase==='fold'){ui.center.classList.add('hidden');bottom.style.opacity='0';ui.chapter.textContent='РАЗРЫВ / ПЕРЕХОД'}
 else if(phase==='sea'){ui.chapter.textContent='ГЛАВА 02 / МОРЕ';ui.eyebrow.textContent='МОРЕ БЕЗ ВОДЫ';ui.heading.innerHTML='ПОД ВОЛНАМИ<br>КТО-ТО ЕСТЬ';ui.description.textContent='Море не должно смотреть на тебя.';ui.gesture.textContent=hold<.95?'ПРИЖМИ ПАЛЕЦ К МОРЮ И УДЕРЖИВАЙ':'ТЫ РАЗБУДИЛ ТО, ЧТО БЫЛО ПОД НИМ';ui.sub.textContent=hold<.95?'ЧЕРНИЛА ПОКАЖУТ, ЧТО СПРЯТАНО':'НЕ ОТПУСКАЙ НИТЬ';ui.progress.style.width=(hold*100)+'%';ui.counter.textContent=`${Math.round(hold*100)}% / ПРОБУЖДЕНИЕ`}
+else if(phase==='dive'){ui.center.classList.add('hidden');bottom.style.opacity='0';ui.chapter.textContent='РАЗРЫВ / ПОГРУЖЕНИЕ'}
+else if(phase==='room'){ui.chapter.textContent='ГЛАВА 03 / КОМНАТА';ui.eyebrow.textContent='ГРАВИТАЦИЯ ЗАБЫЛА ПРАВИЛА';ui.heading.innerHTML='КОМНАТА<br>БЕЗ ВЕСА';ui.description.textContent='Луна потеряла своё место.';ui.gesture.textContent='ВОЗЬМИ ЛУНУ И ВЕРНИ В КОЛЬЦО';ui.sub.textContent='ТАЩИ СВЕТЯЩИЙСЯ ДИСК К ВЕРХНЕМУ ЗНАКУ';ui.counter.textContent='03 / ТРЕТИЙ ШОВ';ui.progress.style.width=(roomOpen*100)+'%'}
 else if(phase==='end'){ui.center.classList.add('hidden');bottom.style.opacity='0';ui.end.classList.add('show');ui.chapter.textContent='ПРОЛОГ / ЗАВЕРШЁН'}
 }
 function resize(){W=window.innerWidth;H=window.innerHeight;DPR=Math.min(window.devicePixelRatio||1,quality==='high'?1.85:quality==='medium'?1.5:1.2);C.width=Math.round(W*DPR);C.height=Math.round(H*DPR);g.setTransform(DPR,0,0,DPR,0,0);resetRope()}
@@ -239,6 +240,80 @@ function transitionDraw(){
  for(let i=0;i<42;i++){const x=rnd(i+88)*W,y=H*(.31+rnd(i+129)*.44);let a=Math.sin(p*Math.PI)*(.08+rnd(i+91)*.28);g.fillStyle=`rgba(234,199,148,${Math.max(a,0)})`;g.fillRect(x+Math.sin(clock+i)*p*12,y+p*H*.1,1,1)}
  colorVignette(.45)
 }
+// The third space is drawn procedurally: every board, object and moon component
+// is vector-based, so the iPhone doesn't load another large background texture.
+function roomPoint(x,y){return{x:x*W,y:y*H}}
+function drawRoomGeometry(){
+ const pan=(pointer.x/W-.5)*.012,sw=Math.sin(clock*.27)*.004;
+ g.save();g.fillStyle='#11100f';g.fillRect(0,0,W,H);
+ // The shattered city remains outside the window, but is never the room's main plane.
+ g.globalAlpha=.18;cover(images.city,pan*W*2,-H*.06,1.12);g.globalAlpha=1;
+ const shade=g.createLinearGradient(0,0,0,H);shade.addColorStop(0,'#090a09eb');shade.addColorStop(.50,'#15120edb');shade.addColorStop(1,'#0a0b0add');g.fillStyle=shade;g.fillRect(0,0,W,H);
+ const horizon=H*.41,vanish={x:W*(.51+pan),y:horizon};
+ // Two angled walls, their bevels and engraved woodgrain.
+ g.fillStyle='#26221d';g.beginPath();g.moveTo(0,0);g.lineTo(W*.27,H*.15);g.lineTo(W*.26,H*.77);g.lineTo(0,H);g.closePath();g.fill();
+ g.fillStyle='#29221c';g.beginPath();g.moveTo(W,0);g.lineTo(W*.77,H*.15);g.lineTo(W*.76,H*.76);g.lineTo(W,H);g.closePath();g.fill();
+ for(let j=0;j<2;j++){let sx=j?W:0,tx=j?W*.76:W*.26;for(let i=0;i<15;i++){const q=i/14;line(mix(sx,tx,q),0,mix(sx,tx,q),H*.9,`rgba(232,208,166,${.028+(i%4===0?.040:0)})`,.6)}}
+ g.strokeStyle='#a08b6b';g.lineWidth=1.3;g.strokeRect(W*.26,H*.15,W*.51,H*.62);
+ for(let i=0;i<5;i++){let y=H*(.18+i*.106);line(W*.26,y,W*.77,y,'rgba(195,169,131,.20)',.75)}
+ // Framed window acts as a spatial anchor and softly exposes the impossible world.
+ g.save();g.beginPath();g.roundRect(W*.34,H*.19,W*.30,H*.30,[W*.15,W*.15,2,2]);g.clip();g.globalAlpha=.45;cover(images.city,-pan*W*6,-H*.24,1.45);g.restore();
+ g.strokeStyle='#c7af82';g.lineWidth=2;g.beginPath();g.roundRect(W*.34,H*.19,W*.30,H*.30,[W*.15,W*.15,2,2]);g.stroke();
+ line(W*.49,H*.20,W*.49,H*.48,'rgba(230,209,169,.6)',1);
+ // Ground boards converge toward the vanishing point; hatching adds print texture.
+ g.beginPath();g.moveTo(0,H);g.lineTo(W*.26,H*.77);g.lineTo(W*.77,H*.77);g.lineTo(W,H);g.closePath();g.fillStyle='#312922';g.fill();
+ for(let i=0;i<=17;i++){const x=W*i/17;line(x,H,vanish.x+(x-W*.5)*.11,H*.76,'rgba(226,195,145,.25)',i%4===0?1.2:.5)}
+ for(let i=0;i<10;i++){let q=Math.pow(i/10,1.45),yy=mix(H*.77,H,q);line(W*(.26*(1-q)),yy,W*(.77+.23*q),yy,`rgba(223,200,166,${.14+q*.12})`,.7)}
+ // Hairline scratches are etched into walls and floor, not floating UI particles.
+ for(let i=0;i<65;i++){let xx=rnd(240+i*5)*W,yy=rnd(170+i*17)*H;if(yy<H*.19)continue;let sz=(1+rnd(i*23)*7);line(xx,yy,xx+sz,yy-sz*.23,'rgba(219,190,149,.07)',.45)}
+ // Floating chair: legs, back, and seat rock at an independent clock frequency.
+ g.save();g.translate(W*.21,H*.49);g.rotate(-.16+Math.sin(clock*.44)*.035);g.strokeStyle='#d1b790';g.lineWidth=2.3;
+ g.beginPath();g.moveTo(-14,-65);g.lineTo(-18,28);g.lineTo(16,23);g.lineTo(20,-52);g.stroke();
+ g.fillStyle='#2b1f18';g.fillRect(-21,15,44,13);g.strokeRect(-21,15,44,13);
+ line(-15,26,-19,80,'#a79475',2.3);line(17,26,26,72,'#a79475',2.3);
+ for(let k=0;k<5;k++)line(-13,-55+k*12,16,-48+k*12,'rgba(213,187,139,.55)',1);
+ g.restore();
+ // An old clock that refuses to obey gravity.
+ g.save();g.translate(W*.79,H*.62);g.rotate(.23+Math.sin(clock*.31)*.028);
+ g.fillStyle='#211b17';g.beginPath();g.ellipse(0,0,W*.092,W*.116,0,0,7);g.fill();
+ g.lineWidth=2.1;g.strokeStyle='#c8b18b';g.stroke();for(let k=0;k<12;k++){let a=k*Math.PI/6;line(Math.cos(a)*W*.070,Math.sin(a)*W*.091,Math.cos(a)*W*.083,Math.sin(a)*W*.103,'#d1b58c',.9)}
+ line(0,0,-W*.033,-H*.016,'#ebc896',1.3);line(0,0,W*.013,-H*.056,'#ebc896',1.3);g.restore();
+ // Reversed-gravity motes: their deterministic movement points upward.
+ for(let i=0;i<34;i++){let x=(rnd(i*7+220)*W+Math.sin(clock*.27+i)*4),y=(rnd(i*13+91)*H-clock*(4+rnd(i*11)*7))%H;if(y<0)y+=H;g.fillStyle=`rgba(233,201,154,${.15+rnd(i+280)*.19})`;g.fillRect(x,y,.7,.7)}
+ g.restore();
+}
+function drawRoomMoon(){
+ const cx=W*roomMoon.x,cy=H*roomMoon.y,r=Math.min(W*.145,H*.075),socket=roomPoint(.73,.30);
+ // Socket has three orbit arcs and a living internal mechanism.
+ g.save();g.translate(socket.x,socket.y);g.rotate(clock*.09);g.strokeStyle='#d2b58b';g.lineWidth=1.4;g.beginPath();g.arc(0,0,r*.86,0,Math.PI*2);g.stroke();
+ for(let k=0;k<9;k++){let a=k*Math.PI*2/9;line(Math.cos(a)*r*.92,Math.sin(a)*r*.92,Math.cos(a)*r*1.09,Math.sin(a)*r*1.09,'#d7b887',1)}
+ g.restore();
+ let alpha=.2+.2*Math.sin(clock*1.8);g.fillStyle=`rgba(234,200,154,${alpha})`;g.beginPath();g.arc(socket.x,socket.y,3.2,0,7);g.fill();
+ // Red thread reaches moon: the physical clue remains visible at all times.
+ const tension=drag?.14:0;
+ g.beginPath();g.moveTo(W*.72,-10);g.bezierCurveTo(W*.66,H*.15,cx+W*.08+Math.sin(clock*2)*5,cy-H*.20,cx,cy-r*.6);
+ g.strokeStyle='#4c1410';g.lineWidth=7;g.stroke();g.strokeStyle='#d73525';g.lineWidth=2.4;g.stroke();
+ g.save();g.translate(cx,cy);g.rotate((roomMoon.x-.32)*.22+Math.sin(clock*.26)*.055);
+ const gleam=g.createRadialGradient(-r*.25,-r*.36,r*.07,0,0,r*1.12);gleam.addColorStop(0,'#f8e4c0');gleam.addColorStop(.62,'#a18d74');gleam.addColorStop(1,'#292723');g.fillStyle=gleam;g.shadowBlur=21;g.shadowColor='#d0b18c5e';g.beginPath();g.arc(0,0,r,0,7);g.fill();g.shadowBlur=0;
+ g.save();g.beginPath();g.arc(0,0,r,0,7);g.clip();for(let k=0;k<34;k++){let xx=(rnd(k*7+55)-.5)*r*2,yy=(rnd(k*9+75)-.5)*r*2,rr=1+rnd(k*5)*r*.15;g.strokeStyle='rgba(61,48,40,.20)';g.lineWidth=.8;g.beginPath();g.ellipse(xx,yy,rr,rr*.6,k*.8,0,7);g.stroke()}g.restore();
+ // Close-up mechanical petals open only once the moon reaches the socket.
+ const op=roomOpen,petals=9;for(let k=0;k<petals;k++){let a=k*Math.PI*2/petals,dist=r*(.22+op*.83);g.save();g.rotate(a);g.translate(0,-dist);g.rotate(-.35*op);g.strokeStyle='#d9bb8e';g.fillStyle=op>.25?'#32251e':'#625746';g.lineWidth=.8;g.beginPath();g.moveTo(0,-r*.27);g.quadraticCurveTo(r*.15,0,0,r*.29);g.quadraticCurveTo(-r*.15,0,0,-r*.27);g.fill();g.stroke();g.restore()}
+ g.fillStyle='#7b271a';g.shadowBlur=op*32;g.shadowColor='#d73525';g.beginPath();g.arc(0,0,r*.105+op*r*.16,0,7);g.fill();g.restore();
+ if(roomSolved){g.fillStyle='rgba(213,53,37,.09)';g.fillRect(0,0,W,H)}
+}
+function roomDraw(){drawRoomGeometry();drawRoomMoon();colorVignette(.3)}
+function diveDraw(){
+ const p=smooth(timeInPhase/(reduced?.65:2.9));
+ // A single visual material moves between both chapters: ink lines become floorboards.
+ roomDraw();g.save();g.globalAlpha=1-smooth(clamp((p-.30)/.7,0,1));
+ g.translate(W*.5,H*.5);g.rotate(p*.08);g.scale(1,1+p*.42);g.translate(-W*.5,-H*.5);oceanBase();creature(1);
+ g.save();g.globalAlpha=1-p;waveLines(1);g.restore();g.restore();
+ // The eye turns into the first clockwork seam of the room.
+ const x=mix(W*.55,W*.32,p),y=mix(H*.58,H*.53,p),radius=(1-p)*W*.10+4;
+ g.beginPath();g.arc(x,y,radius,0,Math.PI*2);g.strokeStyle=`rgba(215,53,37,${.55*(1-p)})`;g.lineWidth=3;g.stroke();
+ colorVignette(.3)
+}
+
 function revealDraw(){cityLayer();g.fillStyle=`rgba(10,9,8,${clamp((1-reveal)*.85,0,.85)})`;g.fillRect(0,0,W,H);for(let j=0;j<18;j++){let x=rnd(j*15)*W,y=rnd(j*9)*H;let p=reveal;line(x,y,x+(rnd(j+19)-.5)*W*.18*p,y+(rnd(j+32)-.5)*H*.24*p,`rgba(241,208,159,${(1-p)*.14})`,1)}colorVignette(.3)}
 function sparks(x,y,n=20){for(let i=0;i<n;i++)particles.push({x,y,vx:(rnd(i+clock*19)-.5)*100,vy:(rnd(i*3+clock*24)-.5)*150,life:1,size:1+rnd(i*12)*2})}
 function drawSparks(dt){g.save();particles=particles.filter(p=>p.life>0);for(const p of particles){p.life-=dt*.58;p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=7*dt;g.fillStyle=`rgba(234,91,59,${clamp(p.life,0,1)})`;g.fillRect(p.x,p.y,p.size,p.size)}g.restore()}
@@ -256,6 +331,8 @@ function drawIdleGuide(){
   const controlY=(start.y+target.y)/2-40;
   g.quadraticCurveTo(controlX,controlY,target.x,target.y);g.stroke();
   g.setLineDash([]);g.beginPath();g.arc(target.x,target.y,Math.min(W*.065,25)+3*Math.sin(clock*2),0,Math.PI*2);g.stroke();
+ }else if(phase==='room'&&!roomSolved){
+  const x=W*.73,y=H*.30;g.beginPath();g.arc(x,y,W*.079+Math.sin(clock*2)*2,0,Math.PI*2);g.stroke();
  }else if(phase==='sea'&&hold<.95){
   g.setLineDash([2,8]);g.beginPath();g.ellipse(W*.5,H*.78,Math.min(34,W*.10),Math.min(18,W*.055),0,0,Math.PI*2);g.stroke();
   g.setLineDash([]);g.beginPath();g.arc(W*.5,H*.78,3,0,Math.PI*2);g.fill();
@@ -264,12 +341,14 @@ function drawIdleGuide(){
  }
  g.restore();
 }
-function draw(dt){g.save();g.setTransform(DPR,0,0,DPR,0,0);g.clearRect(0,0,W,H);if(phase==='intro')introDraw();else if(phase==='reveal')revealDraw();else if(phase==='city')cityDraw();else if(phase==='fold')transitionDraw();else if(phase==='sea')seaDraw();else if(phase==='end')seaDraw();drawIdleGuide();drawSparks(dt);grain();g.restore()}
+function draw(dt){g.save();g.setTransform(DPR,0,0,DPR,0,0);g.clearRect(0,0,W,H);if(phase==='intro')introDraw();else if(phase==='reveal')revealDraw();else if(phase==='city')cityDraw();else if(phase==='fold')transitionDraw();else if(phase==='sea')seaDraw();else if(phase==='dive')diveDraw();else if(phase==='room')roomDraw();else if(phase==='end')roomDraw();drawIdleGuide();drawSparks(dt);grain();g.restore()}
 function tick(ts){if(!last)last=ts;let dt=clamp((ts-last)/1000,.0001,.042);last=ts;if(!hidden){clock+=dt;timeInPhase+=dt;idleSeconds+=dt;if(phase==='reveal'){reveal=clamp(timeInPhase/(reduced?1:2),0,1);if(reveal>=1)setPhase('city')}
 if(phase==='city'){physicsRope(dt);if(timeInPhase>3.4)ui.center.classList.add('hidden')}
 if(phase==='fold'&&!transitionSoundPlayed){transitionSoundPlayed=true;beep(122,1.1);textureSound(250,2.0,.18)}if(phase==='fold'){fold=clamp(timeInPhase/(reduced?.7:2.7),0,1);if(fold>=1){hold=0;setPhase('sea')}}
-if(phase==='sea'){if(hold>.12)ui.center.classList.add('hidden');for(const r of seaImpulses)r.age+=dt;seaImpulses=seaImpulses.filter(r=>r.age<2.2);if(drag&&Math.random()<dt*12){seaImpulses.push({x:pointer.x,y:pointer.y,age:0,power:.45});if(seaImpulses.length>14)seaImpulses.shift()}}if(phase==='sea'&&drag&&seaHoldOrigin&&Math.hypot(pointer.x-seaHoldOrigin.x,pointer.y-seaHoldOrigin.y)<Math.max(W*.4,150)){hold=clamp(hold+dt/(reduced?1:2.9),0,1);ui.progress.style.width=(hold*100).toFixed(1)+'%';ui.counter.textContent=Math.round(hold*100)+'% / ПРОБУЖДЕНИЕ';if(hold>.95){ui.gesture.textContent='ТЫ РАЗБУДИЛ ТО, ЧТО БЫЛО ПОД НИМ';ui.sub.textContent='ВЗГЛЯНИ ЕМУ В ГЛАЗА'}if(hold>=1&&!seaDone){seaDone=true;beep(93,.9);textureSound(440,.8,.24);setTimeout(()=>{if(phase==='sea')setPhase('end')},reduced?1200:2600)}}
+if(phase==='sea'){if(hold>.12)ui.center.classList.add('hidden');for(const r of seaImpulses)r.age+=dt;seaImpulses=seaImpulses.filter(r=>r.age<2.2);if(drag&&Math.random()<dt*12){seaImpulses.push({x:pointer.x,y:pointer.y,age:0,power:.45});if(seaImpulses.length>14)seaImpulses.shift()}}if(phase==='sea'&&drag&&seaHoldOrigin&&Math.hypot(pointer.x-seaHoldOrigin.x,pointer.y-seaHoldOrigin.y)<Math.max(W*.4,150)){hold=clamp(hold+dt/(reduced?1:2.9),0,1);ui.progress.style.width=(hold*100).toFixed(1)+'%';ui.counter.textContent=Math.round(hold*100)+'% / ПРОБУЖДЕНИЕ';if(hold>.95){ui.gesture.textContent='ТЫ РАЗБУДИЛ ТО, ЧТО БЫЛО ПОД НИМ';ui.sub.textContent='ВЗГЛЯНИ ЕМУ В ГЛАЗА'}if(hold>=1&&!seaDone){seaDone=true;beep(93,.9);textureSound(440,.8,.24);setTimeout(()=>{if(phase==='sea')setPhase('dive')},reduced?1200:2600)}}
 if(phase==='sea'&&!drag&&hold<1){hold=Math.max(0,hold-dt*.18)}
+if(phase==='dive'&&timeInPhase>(reduced?.68:2.95))setPhase('room');
+if(phase==='room'&&roomSolved){roomOpen=clamp(roomOpen+dt/(reduced?.3:1.65),0,1);ui.progress.style.width=(roomOpen*100)+'%';if(roomOpen>=1&&timeInPhase>1.4)setPhase('end')}
 if(phase==='end'){hold=1}audioFrame();draw(dt);frames++;frameSum+=dt;if(frameSum>1){fps=Math.round(frames/frameSum);frames=0;frameSum=0;
   if(fps<38){slowSeconds++;fastSeconds=0}else if(fps>55){fastSeconds++;slowSeconds=0}
   else{slowSeconds=0;fastSeconds=0}
@@ -287,8 +366,8 @@ function audioInit(){if(!soundOn)return;try{
  scoreChange(phase);
  }catch(e){}}
 function scoreChange(next){if(!ac||!master)return;let now=ac.currentTime,release=.65;
- const city=next==='city'||next==='reveal',ocean=next==='sea'||next==='end',changing=next==='fold';
- for(const [node,value] of [[droneGain,.016],[windGain,city?.011:changing?.019:.003],[seaGain,ocean?.023:changing?.014:.002]]){
+ const city=next==='city'||next==='reveal',ocean=next==='sea'||next==='dive',changing=next==='fold'||next==='dive',room=next==='room'||next==='end';
+ for(const [node,value] of [[droneGain,room?.023:.016],[windGain,city?.011:changing?.019:room?.003:.003],[seaGain,ocean?.023:changing?.014:room?.005:.002]]){
   if(node)node.gain.setTargetAtTime(value,now,release)
  }
 }
@@ -296,7 +375,7 @@ function audioFrame(){if(!ac||!master||!soundOn)return;audioPulse++;
  if(audioPulse%8!==0)return;
  const tension=phase==='sea'?hold:phase==='intro'?tear:phase==='fold'?fold:passed/3;
  const current=ac.currentTime;
- if(seaGain)seaGain.gain.setTargetAtTime((phase==='sea'||phase==='end')?.014+hold*.022:.002,current,.12);
+ if(seaGain)seaGain.gain.setTargetAtTime((phase==='sea'||phase==='dive')?.014+hold*.022:.002,current,.12);
  if(windGain&&phase==='city')windGain.gain.setTargetAtTime(.008+Math.min(.02,Math.hypot(velocity.x,velocity.y)/900),current,.12);
 }
 function beep(f=270,len=.27){if(!soundOn)return;audioInit();if(!ac||!master)return;
@@ -316,15 +395,17 @@ function textureSound(freq=900,duration=.15,gain=.08){if(!soundOn||!ac||!master)
 function shuffle(x,y){const xx=x-pointer.x,yy=y-pointer.y;velocity.x=xx;velocity.y=yy;pointer.x=x;pointer.y=y}
 function pointerDown(e){if(e.target!==C||activePointerId!==null)return;idleSeconds=0;let x=e.clientX,y=e.clientY;shuffle(x,y);if(phase==='intro'){let knotX=W*.5,knotY=H*(.63+tear*.15);if(Math.hypot(x-knotX,y-knotY)>Math.max(95,W*.27))return;drag=true;activePointerId=e.pointerId;down={x,y,t:clock,tear};C.setPointerCapture(e.pointerId);audioInit();beep(280,.2)}
 else if(phase==='city'){let head=rope[rope.length-1];if(Math.hypot(x-head.x,y-head.y)>Math.max(72,W*.18))return;drag=true;activePointerId=e.pointerId;down={x,y,t:clock};C.setPointerCapture(e.pointerId);audioInit();beep(175,.12);trackGesture(x,y)}
+else if(phase==='room'&&!roomSolved){const mx=W*roomMoon.x,my=H*roomMoon.y;if(Math.hypot(x-mx,y-my)>Math.max(56,W*.17))return;drag=true;activePointerId=e.pointerId;roomDragOrigin={x,y};down={x,y,t:clock};C.setPointerCapture(e.pointerId);audioInit();beep(305,.25)}
 else if(phase==='sea'&&!seaDone){if(Math.hypot(x-W*.5,y-H*.78)>Math.max(82,W*.23))return;drag=true;activePointerId=e.pointerId;seaHoldOrigin={x,y};down={x,y,t:clock};seaImpulses.push({x,y,age:0,power:1.3});C.setPointerCapture(e.pointerId);audioInit();beep(92,.45)} }
 function pointerMove(e){if(activePointerId!==null&&e.pointerId!==activePointerId)return;if(drag)idleSeconds=0;let x=e.clientX,y=e.clientY;const px=pointer.x,py=pointer.y;shuffle(x,y);if(phase==='sea'&&drag&&Math.hypot(x-px,y-py)>8){seaImpulses.push({x,y,age:0,power:Math.min(1.5,Math.hypot(x-px,y-py)/30)});if(seaImpulses.length>18)seaImpulses.shift()}if(!drag)return;if(phase==='intro'){let travel=clamp((y-down.y)/Math.max(H*.28,160),0,1);tear=Math.max(tear,clamp(down.tear+travel,0,1));ui.progress.style.width=Math.round(tear*100)+'%';if(tear>=.94){drag=false;tear=1;sparks(W*.5,H*.5,70);beep(77,.85);textureSound(580,1.0,.22);setPhase('reveal')}}
+if(phase==='room'){roomMoon={x:clamp(x/W,.13,.84),y:clamp(y/H,.20,.74)};const target=roomPoint(.73,.30),start=roomDragOrigin||down;const moved=Math.hypot(x-start.x,y-start.y);if(Math.hypot(x-target.x,y-target.y)<Math.max(W*.090,32)&&moved>W*.17){roomSolved=true;roomMoon={x:.73,y:.30};roomOpen=.01;drag=false;activePointerId=null;beep(476,.72);textureSound(850,.4,.12);sparks(target.x,target.y,55);ui.gesture.textContent='МЕХАНИЗМ ВСПОМНИЛ СВОЮ ОСЬ';ui.sub.textContent='ЛУНА РАСКРЫВАЕТСЯ';saveState()}}
 if(phase==='city'){trackGesture(x,y);let target=ring(passed);const dx=x-px,dy=y-py;const near=target&&Math.hypot(x-target.x,y-target.y)<Math.max(34,W*.10);const movement=Math.hypot(dx,dy);if(near&&movement<Math.max(125,W*.32)){
  stitchEchoes.push({x:target.x,y:target.y,age:0});
  passed++;sparks(target.x,target.y,23);beep(280+passed*130,.4);textureSound(700+passed*350,.12,.10);ui.counter.textContent=`0${passed} / 03`;ui.progress.style.width=passed/3*100+'%';saveState();if(passed===3){drag=false;setTimeout(()=>{if(phase==='city')setPhase('fold')},850)}}}}
-function pointerUp(e){if(activePointerId!==null&&e.pointerId!==activePointerId)return;activePointerId=null;if(!drag)return;drag=false;seaHoldOrigin=null;if(phase==='intro'&&tear<.94){tear=Math.max(0,tear*.8);ui.progress.style.width=Math.round(tear*100)+'%'}if(phase==='city')beep(164,.2)}
+function pointerUp(e){if(activePointerId!==null&&e.pointerId!==activePointerId)return;activePointerId=null;if(!drag)return;drag=false;seaHoldOrigin=null;if(phase==='intro'&&tear<.94){tear=Math.max(0,tear*.8);ui.progress.style.width=Math.round(tear*100)+'%'}if(phase==='city')beep(164,.2);if(phase==='room')saveState()}
 C.addEventListener('pointerdown',pointerDown);C.addEventListener('pointermove',pointerMove);C.addEventListener('pointerup',pointerUp);C.addEventListener('pointercancel',pointerUp);C.addEventListener('lostpointercapture',()=>{drag=false;activePointerId=null});
 document.getElementById('sound').addEventListener('click',()=>{soundOn=!soundOn;document.getElementById('sound').textContent=soundOn?'ЗВУК ВКЛ':'ЗВУК ВЫКЛ';if(soundOn){audioInit();beep(440,.25)}else if(ac){ac.suspend()}});
-document.getElementById('restart').addEventListener('click',()=>{passed=0;tear=0;hold=0;gesturePath=[];seaDone=false;drag=false;activePointerId=null;seaImpulses=[];stitchEchoes=[];transitionSoundPlayed=false;resetRope();setPhase('intro')});
+document.getElementById('restart').addEventListener('click',()=>{passed=0;tear=0;hold=0;gesturePath=[];roomMoon={x:.32,y:.53};roomSolved=false;roomOpen=0;roomDragOrigin=null;seaDone=false;drag=false;activePointerId=null;seaImpulses=[];stitchEchoes=[];transitionSoundPlayed=false;resetRope();setPhase('intro')});
 document.getElementById('save').addEventListener('click',()=>{try{
  const d=document.createElement('canvas');d.width=900;d.height=1600;
  const x=d.getContext('2d');x.fillStyle='#0c0c0d';x.fillRect(0,0,900,1600);
@@ -332,8 +413,8 @@ document.getElementById('save').addEventListener('click',()=>{try{
  x.fillStyle='#070706aa';x.fillRect(0,0,900,1600);
  x.strokeStyle='#aa9173';x.lineWidth=2;x.strokeRect(48,45,804,1510);
  x.textAlign='center';x.fillStyle='#e9dfca';x.font='bold 28px system-ui';x.fillText('Ш О В / S E A M',450,115);
- x.fillStyle='#d1bfa4';x.font='20px system-ui';x.fillText('Г Л А В А   0 1   /   А Р Х И В   Н И Т И',450,165);
- x.font='70px Georgia';x.fillStyle='#f0dfc1';x.fillText('МОРЕ ПОМНИТ',450,610);
+ x.fillStyle='#d1bfa4';x.font='20px system-ui';x.fillText('Г Л А В Ы   0 1 – 0 3   /   А Р Х И В   Н И Т И',450,165);
+ x.font='70px Georgia';x.fillStyle='#f0dfc1';x.fillText('ЛУНА ПОМНИТ',450,610);
  x.font='21px system-ui';x.fillText('ТВОЙ СЛЕД В ЭТОМ МИРЕ',450,676);
  x.save();x.beginPath();x.rect(80,735,740,570);x.clip();
  let pts=gesturePath;
@@ -347,7 +428,7 @@ document.getElementById('save').addEventListener('click',()=>{try{
   x.strokeStyle='#d73525';x.lineWidth=6;x.stroke();
  }
  x.restore();x.font='17px system-ui';x.fillStyle='#c8b79d';
- x.fillText('Ни один шов не повторяется дважды',450,1450);
+ x.fillText('Ты прошёл три пространства, но нить продолжается',450,1450);
  d.toBlob(async blob=>{if(!blob)return;const file=new File([blob],'shov-imprint.png',{type:'image/png'});
   if(navigator.canShare&&navigator.canShare({files:[file]})){
    try{await navigator.share({files:[file],title:'ШОВ / SEAM'});return}
@@ -357,18 +438,11 @@ document.getElementById('save').addEventListener('click',()=>{try{
  },'image/png')
  }catch(err){alert('Не получилось сохранить изображение. Открой игру в Safari.')}});
 
-document.addEventListener('visibilitychange',()=>{hidden=document.hidden;last=0;if(hidden){drag=false;activePointerId=null;seaHoldOrigin=null;saveState();if(ac)ac.suspend();}if(!hidden&&soundOn&&ac)ac.resume()});window.addEventListener('pagehide',saveState);
+document.addEventListener('visibilitychange',()=>{hidden=document.hidden;last=0;if(hidden){drag=false;activePointerId=null;seaHoldOrigin=null;roomDragOrigin=null;saveState();if(ac)ac.suspend();}if(!hidden&&soundOn&&ac)ac.resume()});window.addEventListener('pagehide',saveState);
 resume();syncUI();requestAnimationFrame(tick);
 
-if('serviceWorker' in navigator && /^https?:/.test(location.protocol)){
- const hadController=!!navigator.serviceWorker.controller;
- navigator.serviceWorker.addEventListener('controllerchange',()=>{
-  if(hadController)document.getElementById('updateReady').classList.add('show');
- });
- navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'}).catch(()=>{});
-}
 document.getElementById('updateReady').addEventListener('click',()=>{saveState();location.reload()});
 })();
 </script>
-</body>
+<script>if("serviceWorker" in navigator && /^https?:/.test(location.protocol))navigator.serviceWorker.register("./sw.js",{updateViaCache:"none"}).catch(()=>{});</script></body>
 </html>

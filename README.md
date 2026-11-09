@@ -1,15 +1,16 @@
-# ШОВ / SEAM — v0.9
-Interactive art adventure designed for iPhone Safari and standalone installation.
+# ШОВ / SEAM — v1.1
 
-This isolated deployment branch is NOT the original project's main branch.
-The game is currently a polished **vertical slice**: paper tear, stitched city, folding horizon and a responsive etched ocean with a creature encounter. The complete six-chapter story is still in development.
+Interactive engraved art adventure for iPhone Safari. This branch is isolated from the unrelated `main` project.
 
-## How to host
-Serve this directory over HTTPS. `index.html` contains the complete illustration assets and interactive logic; `manifest.webmanifest`, `icon-*.png` and `sw.js` enable installation and offline support.
-`sw.js` uses network-first navigation so updates don't stay stale.
+## Current gameplay
+A tactile paper tear reveals a stitched impossible city; three ring interactions collapse the skyline into the ocean. Holding the ocean's red knot reveals a creature, after which the scene becomes a zero-gravity room with a draggable mechanical moon. A personalized collectible imprint records both the red thread's path and the moon's actual trajectory.
+
+## Deployment
+The root `index.html` embeds three visual assets; `manifest.webmanifest`, `icon-192.png`, `icon-512.png`, and `sw.js` implement standalone PWA support. Service worker cache version is `shov-v11`. HTTPS hosting is required for installable PWA behavior.
+
+**This GitHub branch is not confirmation of a live website.** Updating the existing ChatGPT Sites URL requires an actual Sites deployment operation. See `SITES_HANDOFF.md`.
 
 ## QA
-The test workflow checks JS syntax and bundled images. Full automated Chromium gameplay and PNG export passed locally on the 390×844 mobile viewport; this does not substitute for real iPhone Safari QA.
+Automated full path on Chromium 390×844 passed without JS errors, including downloadable 900×1600 PNG. iPhone Safari and offline install are not yet verified; local HTTP tests were blocked by the test environment.
 
-## v0.9
-Hand-drawn ring seal animation, additional city light planes, safe PWA update prompt, improved visibility-state cleanup, and progress migration from previous builds.
+The remainder of chapters IV–VI and the real story ending are not yet implemented.

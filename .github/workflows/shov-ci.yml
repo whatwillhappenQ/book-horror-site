@@ -1,0 +1,33 @@
+name: SHOV quality checks
+on:
+  push:
+    branches: [shov-seam-deploy]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate standalone PWA
+        run: |
+          python3 - <<'PY'
+          import json, pathlib, re
+          html = pathlib.Path('index.html').read_text(encoding='utf8')
+          manifest = json.loads(pathlib.Path('manifest.webmanifest').read_text(encoding='utf8'))
+          assert html.count('data:image/webp;base64,') == 3
+          assert 'shov_v09_state' in html
+          assert 'navigator.serviceWorker.register' in html
+          assert manifest['display'] == 'standalone'
+          for icon in manifest['icons']:
+              assert pathlib.Path(icon['src']).exists(), icon['src']
+          match = re.search(r'<script>(.*?)</script>',html,re.S)
+          assert match is not None
+          pathlib.Path('/tmp/shov-inline.js').write_text(match.group(1))
+          print('Valid PWA manifest, offline artwork and app source')
+          PY
+          node --check /tmp/shov-inline.js
